@@ -14,6 +14,8 @@ class Api::V1::AccountsController < Api::BaseController
 
   skip_before_action :require_authenticated_user!, only: :create
 
+  override_rate_limit_headers :follow, family: :follows
+
   respond_to :json
 
   def show
@@ -31,7 +33,7 @@ class Api::V1::AccountsController < Api::BaseController
   end
 
   def follow
-    FollowService.new.call(current_user.account, @account, reblogs: truthy_param?(:reblogs))
+    FollowService.new.call(current_user.account, @account, reblogs: truthy_param?(:reblogs), with_rate_limit: true)
 
     options = @account.locked? || current_user.account.silenced? ? {} : { following_map: { @account.id => { reblogs: truthy_param?(:reblogs) } }, requested_map: { @account.id => false } }
 

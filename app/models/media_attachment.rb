@@ -139,6 +139,7 @@ class MediaAttachment < ApplicationRecord
   remotable_attachment :file, VIDEO_LIMIT, suppress_errors: false
 
   include Attachmentable
+  include RateLimitable
 
   validates :account, presence: true
   validates :description, length: { maximum: MAX_DESCRIPTION_LENGTH }, if: :local?
@@ -151,6 +152,8 @@ class MediaAttachment < ApplicationRecord
   scope :cached,     -> { remote.where.not(file_file_name: nil) }
 
   default_scope { order(id: :asc) }
+
+  rate_limit by: :account, family: :media
 
   def local?
     remote_url.blank?

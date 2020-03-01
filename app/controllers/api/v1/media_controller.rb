@@ -4,6 +4,8 @@ class Api::V1::MediaController < Api::BaseController
   before_action -> { doorkeeper_authorize! :write, :'write:media' }
   before_action :require_user!
 
+  override_rate_limit_headers :create, family: :media
+
   respond_to :json
 
   def create

@@ -58,10 +58,6 @@ class Rack::Attack
     req.remote_ip if req.api_request? && req.unauthenticated?
   end
 
-  throttle('throttle_api_media', limit: 30, period: 30.minutes) do |req|
-    req.authenticated_user_id if req.post? && req.path.start_with?('/api/v1/media')
-  end
-
   throttle('throttle_media_proxy', limit: 30, period: 10.minutes) do |req|
     req.remote_ip if req.path.start_with?('/media_proxy')
   end
@@ -70,7 +66,6 @@ class Rack::Attack
     req.remote_ip if req.post? && req.path == '/api/v1/accounts'
   end
 
-  # Throttle paging, as it is mainly used for public pages and AP collections
   throttle('throttle_authenticated_paging', limit: 300, period: 15.minutes) do |req|
     req.authenticated_user_id if req.paging_request?
   end
